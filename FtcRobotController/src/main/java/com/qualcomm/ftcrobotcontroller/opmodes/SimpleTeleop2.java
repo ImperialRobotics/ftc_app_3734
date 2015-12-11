@@ -13,7 +13,7 @@ public class SimpleTeleop2 extends OpMode
     as the servo approaches 1 the door is extending open.
   */
     // TETRIX VALUES.
-    final static double door_MIN_RANGE  = 0.10;
+    final static double door_MIN_RANGE  = 0.50;
     final static double door_MAX_RANGE  = 1.00;
 
     // position of the door servo.
@@ -133,14 +133,18 @@ public class SimpleTeleop2 extends OpMode
         }
 
         //CONTROLLER 2
-        if (gamepad2.a)
+        if (gamepad1.dpad_down)
         {
             // if the A button is pushed on gamepad2, carwash will intake at full power
             beaterbar.setPower(1);
         }
-        if (gamepad2.b)
+        if (gamepad1.dpad_up)
         {
             beaterbar.setPower(-1);
+        }
+        if(gamepad1.left_bumper)
+        {
+            beaterbar.setPower(0);
         }
 
         // clip the position values so that they never exceed their allowed range.
