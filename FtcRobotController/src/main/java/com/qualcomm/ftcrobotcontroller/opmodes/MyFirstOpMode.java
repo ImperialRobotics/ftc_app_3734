@@ -23,18 +23,18 @@ public class MyFirstOpMode extends OpMode{
     */
 
     //wheelMotors
-    private DcMotor motorLeft1;
+    private DcMotor leftDrive;//leftDrive, rightDrive
     private DcMotor motorLeft2;
 
-    private DcMotor motorRight1;
+    private DcMotor rightDrive;
     private DcMotor motorRight2;
 
     //armMotors
     private DcMotor motorArm1;
     private DcMotor motorArm2;
     //servos
-    private Servo trapDoor1;
-    private Servo trapDoor2;
+    private Servo Door;
+
 
     //carwash motors
     DcMotor motorCrashWash;
@@ -54,20 +54,20 @@ public class MyFirstOpMode extends OpMode{
     public void init(){
 
         // motors
-        motorLeft1 = hardwareMap.dcMotor.get("motor1");
-        motorLeft2 = hardwareMap.dcMotor.get("motor2");
+        leftDrive = hardwareMap.dcMotor.get("leftDrive");
+        //motorLeft2 = hardwareMap.dcMotor.get("motor2");
 
-        motorRight1 = hardwareMap.dcMotor.get("motor3");
-        motorRight2 = hardwareMap.dcMotor.get("motor4");
+        rightDrive = hardwareMap.dcMotor.get("rightDrive");
+       // motorRight2 = hardwareMap.dcMotor.get("motor4");
 
-        motorArm1 = hardwareMap.dcMotor.get("motor5");
-        motorArm2 = hardwareMap.dcMotor.get("motor6");
+       // motorArm1 = hardwareMap.dcMotor.get("motor5");
+        //motorArm2 = hardwareMap.dcMotor.get("motor6");
 
         motorCrashWash = hardwareMap.dcMotor.get("motor7");
         //servos
         //servo values: reverse:0-126, sill: 127 , forward: 128-255
-        trapDoor1 = hardwareMap.servo.get("servo1");
-        trapDoor2 = hardwareMap.servo.get("servo2");
+        Door = hardwareMap.servo.get("servo5");
+
 
 
     }
@@ -88,10 +88,10 @@ public class MyFirstOpMode extends OpMode{
         left =  (float)scaleInput(left);
 
         // Wheel motors
-        motorRight1.setPower(right);
-        motorRight2.setPower(right);
-        motorLeft1.setPower(left);
-        motorLeft2.setPower(left);
+        rightDrive.setPower(right);
+        //motorRight2.setPower(right);
+        leftDrive.setPower(left);
+        //motorLeft2.setPower(left);
 
         //Arm motors
         //rotating the arm
