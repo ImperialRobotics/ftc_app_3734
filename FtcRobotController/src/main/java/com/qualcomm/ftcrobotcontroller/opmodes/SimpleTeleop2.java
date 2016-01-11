@@ -15,27 +15,28 @@ public class SimpleTeleop2 extends OpMode
     // TETRIX VALUES.
     final static double door_MIN_RANGE  = 0.50;
     final static double door_MAX_RANGE  = 1.00;
-
+    final static double knock_MIN_RANGE = 0.50;
+    final static double knock_MAX_RANGE = 1.00;
     // position of the door servo.
     double doorPosition;
-
+    double knockposition;
+    double armangle=0.0;
+    double armextension=0.0;
     // amount to change the arm servo position.
     double doorDelta = 0.2;
-
+    double knockdelta = 0.2;
     //Drive Train
     DcMotor motorRight1;
     DcMotor motorLeft1;
-   // DcMotor motorRight2;
-    //DcMotor motorLeft2;
-
     //Arm control
-    //DcMotor motorextension;
-    //DcMotor motorangle;
+    DcMotor motorextension;
+    DcMotor motorangle;
 
     //Beater Bar
     DcMotor beaterbar;
 
     Servo door;
+    Servo knock;
     /**
      * Constructor
      */
@@ -65,18 +66,15 @@ public class SimpleTeleop2 extends OpMode
           */
         //Drivetrain configuration, names must match up in the phone, direction is viable to change
         motorLeft1 = hardwareMap.dcMotor.get("leftDrive");
-        //motorLeft2 = hardwareMap.dcMotor.get("motorLeft2");
         motorRight1 = hardwareMap.dcMotor.get("rightDrive");
-        //motorRight2 = hardwareMap.dcMotor.get("motorRight2");
         motorLeft1.setDirection(DcMotor.Direction.REVERSE);
-        //motorLeft2.setDirection(DcMotor.Direction.REVERSE);
         motorRight1.setDirection(DcMotor.Direction.FORWARD);
-        //motorRight2.setDirection(DcMotor.Direction.FORWARD);
 
         //arm configuration, names must match up in the phone
-        //motorextension = hardwareMap.dcMotor.get("motorextension");motorangle = hardwareMap.dcMotor.get("motorangle");
-        /*motorextension.setDirection(DcMotor.Direction.FORWARD);
-        motorangle.setDirection(DcMotor.Direction.FORWARD);*/
+        motorextension = hardwareMap.dcMotor.get("motorextension");
+        motorangle = hardwareMap.dcMotor.get("motorangle");
+        motorextension.setDirection(DcMotor.Direction.FORWARD);
+        motorangle.setDirection(DcMotor.Direction.FORWARD);
 
         //beaterbar configuration, names must match up in the phone
         beaterbar= hardwareMap.dcMotor.get("beaterBar");
@@ -84,6 +82,7 @@ public class SimpleTeleop2 extends OpMode
 
         //door servo
         door = hardwareMap.servo.get("Door");
+        knock= hardwareMap.servo.get("knock");
     }
 
     /*
@@ -119,26 +118,15 @@ public class SimpleTeleop2 extends OpMode
 
         // write the values to the motors
         motorRight1.setPower(right);
-        //motorRight2.setPower(right);
         motorLeft1.setPower(left);
-       // motorLeft2.setPower(left);
-        //CONTROLLER 1
-        if(gamepad1.a)
-        {
-            doorPosition += doorDelta;
-        }
-        if(gamepad1.b)
-        {
-            doorPosition -= doorDelta;
-        }
 
-        //CONTROLLER 2
-        if (gamepad1.dpad_down)
+        //CONTROLLER 1
+        if (gamepad1.y)
         {
-            // if the A button is pushed on gamepad2, carwash will intake at full power
+            // if the y button is pushed on gamepad1, carwash will intake at full power
             beaterbar.setPower(1);
         }
-        if (gamepad1.dpad_up)
+        if (gamepad1.a)
         {
             beaterbar.setPower(-1);
         }
@@ -146,12 +134,47 @@ public class SimpleTeleop2 extends OpMode
         {
             beaterbar.setPower(0);
         }
-
+        armangle=0;
+        armextension=0;
+        //CONTROLLER 2
+        if (gamepad2.y)
+        {
+            //change the arm angle up -
+           armangle-=30;
+        }
+        if (gamepad2.a)
+        {
+            //change the arm angle down +
+            armangle+=30;
+        }
+        if (gamepad2.right_bumper)
+        {
+            //open door to score
+            doorPosition += doorDelta;
+        }
+        if (gamepad2.left_bumper)
+        {
+            //knock down the climbers
+            knockposition += knockdelta;
+        }
+        if(gamepad2.dpad_up)
+        {
+            //arm extend outward
+            armextension+=30;
+        }
+        if (gamepad2.dpad_down)
+        {
+            //arm retracts to pull itself up
+            armextension-=30;
+        }
         // clip the position values so that they never exceed their allowed range.
         doorPosition = Range.clip(doorPosition, door_MIN_RANGE, door_MAX_RANGE);
-
+        knockposition=Range.clip(knockposition, knock_MIN_RANGE, knock_MAX_RANGE);
         // write position values to the door servo
         door.setPosition(doorPosition);
+        knock.setPosition(knockposition);
+        motorangle.setPower(armangle);
+        motorextension.setPower(armextension);
 
 
 
@@ -163,6 +186,7 @@ public class SimpleTeleop2 extends OpMode
 		 */
         telemetry.addData("Text", "*** Robot Data***");
         telemetry.addData("door", "door:  " + String.format("%.2f", doorPosition));
+        telemetry.addData("knock", "knock:  " + String.format("%.2f", knockposition));
         telemetry.addData("left tgt pwr",  "left  pwr: " + String.format("%.2f", left));
         telemetry.addData("right tgt pwr", "right pwr: " + String.format("%.2f", right));
 
