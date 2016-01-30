@@ -38,9 +38,11 @@ public class Autonomous extends OpMode
         //write path using methods
         //methods to use: moveForward() , stopMotors() , turnLeft() , turnRight().
         //parameters are speed , distance
+        
         moveForward(0.5 , 5);
         turnRight(0.5 , 4);
         moveForward(0.5 , 5);
+        
     }
 
     public void stopMotors()
@@ -48,7 +50,6 @@ public class Autonomous extends OpMode
         motorRight.setPower(0);
         motorLeft.setPower(0);
     }
-
 
     public void driveForward(double motorPower)
     {
