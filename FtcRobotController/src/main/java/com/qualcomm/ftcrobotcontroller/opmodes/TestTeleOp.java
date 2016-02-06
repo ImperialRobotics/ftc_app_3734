@@ -1,43 +1,49 @@
-
 package com.qualcomm.ftcrobotcontroller.opmodes;
-        import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-        import com.qualcomm.robotcore.hardware.DcMotor;
-        import com.qualcomm.robotcore.hardware.Servo;
-        import com.qualcomm.robotcore.util.Range;
-
-public class SimpleTeleop extends OpMode {
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorController;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.Range;
+/**
+ * Created by 2955733 on 12/10/2015.
+ */
+public class TestTeleOp extends OpMode
+{
     /*
-     * Note: the configuration of the servos is such that
-       as the servo approaches 1 the door is extending open.
-     */
+  * Note: the configuration of the servos is such that
+    as the servo approaches 1 the door is extending open.
+  */
     // TETRIX VALUES.
-    final static double door_MIN_RANGE  = 0.10;
+    final static double door_MIN_RANGE  = 0.00;
     final static double door_MAX_RANGE  = 1.00;
 
     // position of the door servo.
     double doorPosition;
 
     // amount to change the arm servo position.
-    double doorDelta = 0.2;
+    double doorDelta = 0.1;
 
     //Drive Train
     DcMotor motorRight1;
     DcMotor motorLeft1;
-    DcMotor motorRight2;
     DcMotor motorLeft2;
+    // DcMotor motorRight2;
+    //DcMotor motorLeft2;
 
     //Arm control
-    DcMotor motorextension;
-    DcMotor motorangle;
+    DcMotor motorArmAngle;
+    //DcMotor motorextension;
+    //DcMotor motorangle;
 
     //Beater Bar
     DcMotor beaterbar;
 
     Servo door;
+    Servo knock;
     /**
      * Constructor
      */
-    public SimpleTeleop()
+    public TestTeleOp()
     {
 
     }
@@ -62,27 +68,34 @@ public class SimpleTeleop extends OpMode {
            .REVERSE= Motor going opposite the "natural direction"
           */
         //Drivetrain configuration, names must match up in the phone, direction is viable to change
-        motorLeft1 = hardwareMap.dcMotor.get("motorLeft1");
-        motorLeft2 = hardwareMap.dcMotor.get("motorLeft2");
-        motorRight1 = hardwareMap.dcMotor.get("motorRight1");
-        motorRight2 = hardwareMap.dcMotor.get("motorRight2");
-        motorLeft1.setDirection(DcMotor.Direction.REVERSE);
-        motorLeft2.setDirection(DcMotor.Direction.REVERSE);
-        motorRight1.setDirection(DcMotor.Direction.FOWARD);
-        motorRight2.setDirection(DcMotor.Direction.FOWARD);
-
+        motorLeft1 = hardwareMap.dcMotor.get("leftDriveA");
+        motorLeft2= hardwareMap.dcMotor.get("leftDriveB");
+        //motorLeft2 = hardwareMap.dcMotor.get("motorLeft2");
+        motorRight1 = hardwareMap.dcMotor.get("rightDrive");
+        //motorRight2 = hardwareMap.dcMotor.get("motorRight2");
+        motorLeft1.setDirection(DcMotor.Direction.FORWARD);//r
+        motorLeft2.setDirection(DcMotor.Direction.REVERSE);//f
+        //motorLeft2.setDirection(DcMotor.Direction.REVERSE);//
+        motorRight1.setDirection(DcMotor.Direction.REVERSE);//r
+        //motorRight2.setDirection(DcMotor.Direction.FORWARD);
+        doorPosition=0.5;
         //arm configuration, names must match up in the phone
-        motorextension = hardwareMap.dcMotor.get("motorextension");
-        motorangle = hardwareMap.dcMotor.get("motorangle");
-        motorextension.setDirection(DcMotor.Direction.FOWARD);
-        motorangle.setDirection(DcMotor.Direction.FOWARD);
-
+        //motorextension = hardwareMap.dcMotor.get("motorextension");
+        // motorangle = hardwareMap.dcMotor.get("motorangle");
+        motorArmAngle = hardwareMap.dcMotor.get("armAngle");
+        //motorextension.setDirection(DcMotor.Direction.FORWARD);
+        motorArmAngle.setDirection(DcMotor.Direction.FORWARD);
+        motorArmAngle.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
         //beaterbar configuration, names must match up in the phone
-        beaterbar= hardwareMap.dcMotor.get("beaterbar");
-        beaterbar.setDirection(DcMotor.Direction.FOWARD);
+        beaterbar= hardwareMap.dcMotor.get("beaterBar");
+        beaterbar.setDirection(DcMotor.Direction.FORWARD);
 
         //door servo
-        door = hardwareMap.servo.get("door");
+        door = hardwareMap.servo.get("Door");
+        knock= hardwareMap.servo.get("Knock");
+
+        doorPosition = 0.2;
+
     }
 
     /*
@@ -91,7 +104,7 @@ public class SimpleTeleop extends OpMode {
      * @see com.qualcomm.robotcore.eventloop.opmode.OpMode#run()
      */
     @Override
-    public void loop() {
+    public void loop(){
 
 		/*
 		 * Gamepad 1
@@ -118,35 +131,84 @@ public class SimpleTeleop extends OpMode {
 
         // write the values to the motors
         motorRight1.setPower(right);
-        motorRight2.setPower(right);
+        //motorRight2.setPower(right);
         motorLeft1.setPower(left);
         motorLeft2.setPower(left);
+        // motorLeft2.setPower(left);
         //CONTROLLER 1
-        if(gamepad1.a)
+
+        //wait(100);
+
+
+        if(gamepad2.a)
         {
-            doorPosition += doorDelta;
+            doorPosition +=doorDelta;
+            telemetry.addData("door position", doorPosition);
         }
-        if(gamepad1.b)
+        if(gamepad2.b)
         {
-            doorPosition -= doorDelta;
+            doorPosition -=doorDelta;
+            telemetry.addData("door position", doorPosition);
         }
 
-        //CONTROLLER 2
-        if (gamepad2.a)
+        doorPosition = Range.clip(doorPosition , door_MAX_RANGE , door_MIN_RANGE);
+
+        door.setPosition(doorPosition);
+
+
+        if (gamepad1.a)
         {
             // if the A button is pushed on gamepad2, carwash will intake at full power
             beaterbar.setPower(1);
         }
-        if (gamepad2.b)
+        if (gamepad1.y)
         {
             beaterbar.setPower(-1);
         }
+        if(gamepad1.left_bumper)
+        {
+            beaterbar.setPower(0);
+        }
+        //1 to .9
 
+        double x=0.0;
+
+        if(gamepad2.dpad_up)
+        {
+            motorArmAngle.setPower(.1);
+            x++;
+            motorArmAngle.setPower(0.0);
+            telemetry.addData("Power in arm angle", "arm angle: " + String.format("%.2f", -0.3));
+        }
+
+        if(gamepad2.right_bumper){
+            motorArmAngle.setPower(-0.30);
+            telemetry.addData("Power in arm angle", "arm angle: " + String.format("%.2f", 0.3));
+        }
+
+        // clip the right/left values so that the values never exceed +/-, simplifies the input
+
+        // scale the joystick value to make it easier to control
+        // the robot more precisely at slower speeds.
+
+        // write the values to the motors
+        //motorRight2.setPower(right);
+
+        double power1 = 0.0;
+        if (gamepad2.x)
+        {
+            knock.setPosition(.9);
+            knock.setPosition(1);
+        }
+        /*else
+        {
+            power1=0.0;
+            motorArmExtension.setPower(power1);
+        }*/
         // clip the position values so that they never exceed their allowed range.
-        doorPosition = Range.clip(doorPosition, door_MIN_RANGE, door_MAX_RANGE);
 
         // write position values to the door servo
-        door.setPosition(doorPosition);
+
 
 
 
@@ -160,16 +222,16 @@ public class SimpleTeleop extends OpMode {
         telemetry.addData("door", "door:  " + String.format("%.2f", doorPosition));
         telemetry.addData("left tgt pwr",  "left  pwr: " + String.format("%.2f", left));
         telemetry.addData("right tgt pwr", "right pwr: " + String.format("%.2f", right));
-
+        telemetry.addData("Power in arm extension", "arm extension: " + String.format("%.2f", power1));
     }
 
+    @Override
+    public void stop() {
     /*
      * Code to run when the op mode is first disabled goes here
      *
      * @see com.qualcomm.robotcore.eventloop.opmode.OpMode#stop()
      */
-    @Override
-    public void stop() {
 
     }
 

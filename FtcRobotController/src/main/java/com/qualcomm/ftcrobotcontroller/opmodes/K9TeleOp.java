@@ -183,7 +183,6 @@ public class K9TeleOp extends OpMode {
 		claw.setPosition(clawPosition);
 
 
-
 		/*
 		 * Send telemetry data back to driver station. Note that if we are using
 		 * a legacy NXT-compatible motor controller, then the getPower() method
