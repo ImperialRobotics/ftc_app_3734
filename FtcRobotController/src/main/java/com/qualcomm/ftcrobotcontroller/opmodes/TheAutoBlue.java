@@ -28,7 +28,7 @@ import com.qualcomm.robotcore.util.Range;
  *
  */
 
-public class TheTeleOp extends OpMode
+public class TheAutoBlue extends OpMode
 {
     //Drive Train Motors
     DcMotor motorRight1;
