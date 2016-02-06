@@ -34,10 +34,13 @@ public class TheTeleOp extends OpMode
     DcMotor motorRight1;
     DcMotor motorLeft1;
     DcMotor motorLeft2;
+    float left; //left and right motor power variables
+    float right;
+    int direction = 1; //to toggle which direction is considered forward
 
     //Arm Control Motors
     DcMotor motorArmAngle;
-
+    DcMotor motorArmExtension;
 
     //Door and Knock Servos and Restriction Integers
     Servo servoDoor;
@@ -46,13 +49,17 @@ public class TheTeleOp extends OpMode
     final static double DOOR_MIN_RANGE = 0.20;
     final static double DOOR_MAX_RANGE  = 0.90;
 
-    final static double KNOCK_MIN_RANGE = 0.1;
-    final static double KNOCK_MAX_RANGE = 0.9;
+    //2028
+    //2024
+    //final static double KNOCK_MIN_RANGE = 0.9;
+    //final static double KNOCK_MAX_RANGE = 1.0;
+    final static int KNOCK_START = 2100;
+    final static int KNOCK_THROW = 2024;
 
     double doorPosition;
     double doorDelta = 0.05;
 
-    double knockPosition;
+    int knockPosition;
     double knockDelta = 0.1;
     //Beater bar motor
     DcMotor motorBeaterBar;
@@ -70,33 +77,51 @@ public class TheTeleOp extends OpMode
         motorLeft1 = hardwareMap.dcMotor.get("leftDriveA");
         motorLeft2 = hardwareMap.dcMotor.get("leftDriveB");
 
-        motorRight1.setDirection(DcMotor.Direction.FORWARD);
-        motorLeft1.setDirection(DcMotor.Direction.REVERSE);
+        motorRight1.setDirection(DcMotor.Direction.REVERSE);
+        motorLeft1.setDirection(DcMotor.Direction.FORWARD);
         motorLeft2.setDirection(DcMotor.Direction.REVERSE);
 
-        //init arm motor
+        //init arm motors
         motorArmAngle = hardwareMap.dcMotor.get("armAngle");
         motorArmAngle.setDirection(DcMotor.Direction.FORWARD);
+
+        motorArmExtension = hardwareMap.dcMotor.get("armExtension");
+        motorArmExtension.setDirection(DcMotor.Direction.FORWARD);
 
         //init beaterBar
         motorBeaterBar = hardwareMap.dcMotor.get("beaterBar");
 
         //init door and knock position. Starting points
         doorPosition = 0.2;
-        knockPosition = 0.2;
+        knockPosition = KNOCK_START;
 
         servoDoor = hardwareMap.servo.get("Door");
         servoKnock = hardwareMap.servo.get("Knock");
+
+        servoKnock.setPosition(ServoNormalize(KNOCK_START));
 
     }
 
     public void loop()
     {
         //Drive Train Movement Controller 1 using Joystick
+        /*
         float power = -gamepad1.left_stick_y; //Foward, Backwards
         float direction = gamepad1.left_stick_x; // Left, Right
         float right = power - direction;
         float left = power + direction;
+*/
+        if(gamepad1.x) direction *= -1; //toggle which direction is forward
+
+        //TANK Drive
+        left = -gamepad1.left_stick_y;
+        right = -gamepad1.right_stick_y;
+
+        if ((left * right)>0){ // joysticks are in same direction - so apply possible direction toggle;
+
+                left *= direction;
+                right *= direction;
+        }
 
         right = Range.clip(right, -1, 1);
         left = Range.clip(left, -1, 1);
@@ -107,6 +132,8 @@ public class TheTeleOp extends OpMode
         motorRight1.setPower(right);
         motorLeft1.setPower(left);
         motorLeft2.setPower(left);
+
+        motorArmExtension.setPower(-gamepad2.right_stick_y);
 
         //Beater Bar Movement
         if(gamepad1.a)
@@ -134,13 +161,15 @@ public class TheTeleOp extends OpMode
             doorPosition-=doorDelta;
         }
 
-        //Clip the position from going out of bounce
+        //Clip the position from going out of bounds
         doorPosition = Range.clip(doorPosition ,DOOR_MIN_RANGE ,DOOR_MAX_RANGE );
         //set servo value
         servoDoor.setPosition(doorPosition);
 
         //Arm Rotation
-        motorArmAngle.setPower(0);
+
+        motorArmAngle.setPower(gamepad2.left_stick_y/3); //set arm angle with left joystick on second controller - scale down power
+        /*motorArmAngle.setPower(0);
 
         if(gamepad2.dpad_up)
         {
@@ -150,23 +179,26 @@ public class TheTeleOp extends OpMode
         if(gamepad2.right_bumper) {
             motorArmAngle.setPower(-0.30);
         }
+        */
 
         //Knock Movement
-        if(gamepad2.x)
+        if(gamepad2.x) //retract knocker
         {
-            knockPosition+=knockDelta;
+            servoKnock.setPosition(ServoNormalize(KNOCK_START));
+            //knockPosition+=knockDelta;
         }
-        if(gamepad2.y)
+        if(gamepad2.y) //deposit climbers
         {
-            knockPosition-=knockDelta;
+            servoKnock.setPosition(ServoNormalize(KNOCK_THROW));
+            //knockPosition-=knockDelta;
         }
         //Clip knockPosition
-        knockPosition = Range.clip(knockPosition ,KNOCK_MIN_RANGE ,KNOCK_MAX_RANGE );
+        //knockPosition = Range.clip(knockPosition ,KNOCK_MIN_RANGE ,KNOCK_MAX_RANGE );
 
-        servoKnock.setPosition(knockPosition);
+
 
         //telemetry
-        telemetry.addData("Text" , "***Robot Data***");
+        telemetry.addData("Text" , "***CHOSEN ONE DATA***");
 
     }
 
@@ -204,4 +236,9 @@ public class TheTeleOp extends OpMode
         return dScale;
     }
 
+    double ServoNormalize(int pulse)
+    {
+     double normalized = (double)pulse;
+      return (normalized-750.0)/1500.0 ;
+    }
 }

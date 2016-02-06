@@ -56,8 +56,8 @@ public class TeleOp3 extends OpMode
         motorRight1.setDirection(DcMotor.Direction.FORWARD);
 
         //arm configuration, names must match up in the phone
-        motorangle = hardwareMap.dcMotor.get("motorangle");
-        motorangle.setDirection(DcMotor.Direction.FORWARD);
+        //motorangle = hardwareMap.dcMotor.get("motorangle");
+        //motorangle.setDirection(DcMotor.Direction.FORWARD);
 
         //beaterbar configuration, names must match up in the phone
         beaterbar= hardwareMap.dcMotor.get("beaterBar");
@@ -104,8 +104,8 @@ public class TeleOp3 extends OpMode
 		left =  (float)scaleInput(left);
 		
 		// write the values to the motors
-		motorRight.setPower(right);
-		motorLeft.setPower(left);
+		//motorRight.setPower(right);
+		//motorLeft.setPower(left);
 		
     /*Gamepad2
      *Right Trigger = car wash forward
@@ -128,7 +128,7 @@ public class TeleOp3 extends OpMode
     if(gamepad2.dpad_up)
         {
             //arm moves down
-            for(x<50000000)
+            //for(x<50000000)
             {
             armangle.setPower(5);
             x++;
@@ -137,7 +137,7 @@ public class TeleOp3 extends OpMode
         if (gamepad2.dpad_down)
         {
             //arm retracts to pull itself up
-            armextension-=30;
+            //armextension-=30;
         }
         if(gamepad2.dpad_right)
         {
