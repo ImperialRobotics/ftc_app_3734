@@ -6,7 +6,6 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
 /**
- *
  * Created by 4092694 on 2/4/2016.
  *
  * CONTROLLER 1 CONTROLS:
