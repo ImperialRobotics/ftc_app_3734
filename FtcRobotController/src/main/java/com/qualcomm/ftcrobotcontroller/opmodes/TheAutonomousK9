@@ -1,0 +1,121 @@
+package com.qualcomm.ftcrobotcontroller.opmodes;
+
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
+
+/**
+ * Created by 4092694 on 2/10/2016.
+ *
+ */
+
+public class TheAutonomousK9 extends OpMode
+{
+
+    static final double MOTOR_SPEED = 0.15;//Motor Speeds
+
+    //Knock Data
+    final static int KNOCK_START = 2100;
+    final static int KNOCK_THROW = 2024;
+
+    int knockPosition;
+
+    //Drive Motors
+    DcMotor motorRight;
+    DcMotor motorLeft1;
+    DcMotor motorLeft2;
+
+    DcMotor beaterBarMotor;
+    Servo knock;
+
+    public void init()
+    {
+
+        motorRight = hardwareMap.dcMotor.get("rightDrive");
+        motorLeft1 = hardwareMap.dcMotor.get("leftDriveA");
+        motorLeft2 = hardwareMap.dcMotor.get("leftDriveB");
+
+        motorLeft1.setDirection(DcMotor.Direction.REVERSE);
+        motorLeft2.setDirection(DcMotor.Direction.REVERSE);
+
+        beaterBarMotor = hardwareMap.dcMotor.get("beaterBar");
+
+        knockPosition = KNOCK_START;
+
+        knock = hardwareMap.servo.get("Knock");
+        knock.setPosition(ServoNormalize(KNOCK_START));
+    }
+
+    public void loop()
+    {
+        /*
+         * Forward for 4 seconds
+         * BeaterBar Motor running
+         * Turns Left until second 6
+         * Knock servo activates
+         */
+
+
+        if(this.time <= 6)
+        {
+            moveForward();
+            beaterBarMotor.setPower(-1);
+            telemetry.addData("Right Motor ", "Right Motor Value " + Double.toString(motorRight.getPower()));
+            telemetry.addData("Left Motor 1 " , "Left Motor Value " + Double.toString(motorLeft1.getPower()));
+            telemetry.addData("Left Motor 2 " , "Left Motor Value " + Double.toString(motorLeft2.getPower()));
+
+        }else if(this.time > 6 && this.time <= 8)
+        {
+            moveLeft();
+        }else if(this.time > 8 && this.time <= 10)
+        {
+            knock.setPosition(ServoNormalize(KNOCK_THROW));
+            beaterBarMotor.setPower(-1);
+        }
+
+        telemetry.addData("RobotData" , "***THE CHOSEN ONE***");
+        telemetry.addData("Timer : ", "Timer: " + Double.toString(this.time));
+    }
+
+    public void moveRight()
+    {
+        motorRight.setPower(MOTOR_SPEED);
+        motorLeft1.setPower(-MOTOR_SPEED);
+        motorLeft2.setPower(-MOTOR_SPEED);
+    }
+
+    public void moveLeft()
+    {
+        motorRight.setPower(-MOTOR_SPEED);
+        motorLeft1.setPower(MOTOR_SPEED);
+        motorLeft2.setPower(MOTOR_SPEED);
+    }
+
+    public void moveForward()
+    {
+        motorRight.setPower(MOTOR_SPEED);
+        motorLeft1.setPower(MOTOR_SPEED);
+        motorLeft2.setPower(MOTOR_SPEED);
+    }
+
+    public void moveBackwards()
+    {
+        motorRight.setPower(-MOTOR_SPEED);
+        motorLeft1.setPower(-MOTOR_SPEED);
+        motorLeft2.setPower(-MOTOR_SPEED);
+    }
+
+    public void stop()
+    {
+        motorRight.setPower(0);
+        motorLeft1.setPower(0);
+        motorLeft2.setPower(0);
+    }
+
+    double ServoNormalize(int pulse)
+    {
+        double normalized = (double)pulse;
+        return (normalized - 750.0) / 1500.0 ;
+    }
+
+}
