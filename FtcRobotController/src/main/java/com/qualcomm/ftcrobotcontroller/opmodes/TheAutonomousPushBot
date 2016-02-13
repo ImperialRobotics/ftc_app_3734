@@ -1,0 +1,87 @@
+package com.qualcomm.ftcrobotcontroller.opmodes;
+
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotorController;
+
+/**
+ * Created by 4092694 on 2/6/2016.
+ *
+ */
+
+public class TheAutonomousPushBot extends LinearOpMode
+{
+
+    //Drive Motors
+    DcMotor motorRight;
+
+    DcMotor motorLeft2;
+    DcMotor motorLeft1;
+
+    //Beater Bar Motor
+    DcMotor beaterBarMotor;
+    //Arm Motors
+    DcMotor motorArmRotation;
+
+
+    public void runOpMode() throws InterruptedException
+    {
+        motorRight = hardwareMap.dcMotor.get("rightDrive");
+        motorLeft1 = hardwareMap.dcMotor.get("leftDriveA");
+        motorLeft2 = hardwareMap.dcMotor.get("leftDriveB");
+
+        motorLeft1.setDirection(DcMotor.Direction.REVERSE);
+        motorLeft2.setDirection(DcMotor.Direction.REVERSE);
+
+        motorRight.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+        motorLeft1.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+        motorLeft2.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+
+        beaterBarMotor = hardwareMap.dcMotor.get("beaterBar");
+        beaterBarMotor.setDirection(DcMotor.Direction.FORWARD);
+        beaterBarMotor.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+        motorArmRotation = hardwareMap.dcMotor.get("armAngle");
+
+        waitForStart();
+
+        for(int i = 0; i <= 4; i++)
+        {
+            //move forward for 1000 milliseconds while running beaterbar
+            //1 second = 1000 milliseconds
+
+            motorLeft1.setPower(1);
+            motorLeft2.setPower(1);
+            motorRight.setPower(1);
+
+            beaterBarMotor.setPower(-1);
+
+            //Telemetry
+            telemetry.addData("MotorRightPower", "MotorRightPower :" + String.format("%.2f", motorRight));
+            telemetry.addData("MotorLeft1power", "MotorLeft1Power :" + String.format("%.2f", motorLeft1));
+            telemetry.addData("MotorRightPower", "MotorLeft2Power :" + String.format("%.2f", motorLeft2));
+            //Timer
+            sleep(1000);
+
+            //Turn Left
+            motorLeft1.setPower(0);
+            motorLeft2.setPower(0);
+            motorRight.setPower(0.5);
+
+            beaterBarMotor.setPower(-1);
+
+            //Telemetry
+            telemetry.addData("MotorRightPower", "MotorRightPower :" + String.format("%.2f", motorRight));
+            telemetry.addData("MotorLeft1power", "MotorLeft1Power :" + String.format("%.2f", motorLeft1));
+            telemetry.addData("MotorRightPower", "MotorLeft2Power :" + String.format("%.2f", motorLeft2));
+
+            sleep(250);
+        }
+
+        motorRight.setPowerFloat();
+        motorLeft1.setPowerFloat();
+        motorLeft2.setPowerFloat();
+
+        telemetry.addData("Text" , "***TheChosenOne***");
+
+    }
+}
